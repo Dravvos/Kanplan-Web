@@ -1,0 +1,228 @@
+.main-bg__control {
+    background-color: #1a1a1a !important;
+}
+
+.main-bg__option {
+    background-color: #1a1a1a !important;
+    color: #e0e0e0 !important;
+}
+
+.main-bg__single-value {
+    color: #e0e0e0 !important;
+}
+
+.main-bg__menu {
+    background-color: #1a1a1a !important;
+    color: #e0e0e0 !important;
+    border-radius: 10px;
+    border-color: #1a1a1a !important;
+}
+
+.main-bg__menu-list {
+    background-color: #1a1a1a !important;
+    color: #e0e0e0 !important;
+    border-radius: 10px;
+    border-color: #1a1a1a !important;
+}
+
+.ipt-bg__control {
+    background-color: #2c2c2c !important;
+    border: none !important;
+}
+
+.ipt-bg__option {
+    background-color: #2c2c2c !important;
+    color: #e0e0e0 !important;
+}
+
+.ipt-bg__option:hover {
+    background-color: #444 !important;
+    color: #e0e0e0 !important;
+
+}
+
+.ipt-bg__single-value {
+    color: #e0e0e0 !important;
+}
+
+.ipt-bg__menu {
+    background-color: #2c2c2c !important;
+    color: #e0e0e0 !important;
+    border-radius: 10px;
+    border-color: #2c2c2c !important;
+}
+
+
+.ipt-bg__menu-list {
+    background-color: #2c2c2c !important;
+    color: #e0e0e0 !important;
+    border-radius: 10px;
+    border-color: #2c2c2c !important;
+}
+
+.label {
+    border-radius: 5px;
+    outline: none;
+    border: none;
+    padding: 1px 7px;
+    font-size: 12px;
+    margin-bottom: 5px;
+}
+
+
+.task {
+    border-radius: 8px;
+    margin-top: 20px;
+    border: none;
+    outline: none;
+    margin-bottom: 3px;
+    box-shadow: 0px 5px 8px 5px rgba(0, 0, 0, 0.3);
+}
+
+.task:hover {
+    box-shadow: 0px 10px 20px 5px rgba(0, 0, 0, 0.3);
+}
+
+.task-body {
+    padding: 14px 20px;
+}
+
+.task-footer {
+    border-top: 1px solid rgb(50, 49, 48);
+    padding-top: 15px;
+    padding-left: 14px;
+    padding-right: 14px;
+    padding-bottom: 20px;
+}
+
+.overflow-y {
+    overflow-y: scroll;
+    max-height: 37em;
+}
+
+.overflow-y-small {
+    overflow-y: scroll;
+    max-height: 17em;
+}
+
+::-webkit-scrollbar {
+    width: 6px;
+    height: 12px;
+}
+
+::-webkit-scrollbar-thumb {
+    background: #888;
+    /* Color of the scrollbar handle */
+    border-radius: 6px;
+    /* Rounded corners */
+}
+
+::-webkit-scrollbar-thumb:hover {
+    background: #555;
+    /* Darker color on hover */
+}
+
+::-webkit-scrollbar-track {
+    background: #f1f1f1;
+    /* Background of the scrollbar track */
+    border-radius: 6px;
+    /* Rounded corners for the track */
+}
+
+.label-list {
+    background-color: transparent;
+    border: none;
+}
+
+.label-list:hover {
+    background-color: #393939 !important;
+}
+
+.ipt-file {
+    border: 1px solid #e0e0e0;
+    background-color: transparent;
+    color: #e0e0e0;
+    width: fit-content;
+    cursor: pointer;
+    padding: 5px 32px;
+}
+
+.ipt-file:hover {
+    background-color: #444444;
+}
+
+#btnAddUser {
+    padding: 7px;
+}
+
+#users :hover #btnAddUser {
+    background-color: #555;
+    border-radius: 100%;
+
+}
+
+.main-dropdown {
+    background-color: #444;
+    box-shadow: 0px 5px 25px 6px rgba(0, 0, 0, 0.3);
+}
+
+.main-dropdown-item {
+    background-color: #444;
+}
+
+.main-dropdown-item:hover {
+    background-color: #777;
+}
+
+
+.select-bg__control {
+    background-color: #201F1E !important;
+    border: none !important;
+}
+
+
+.select-bg__single-value {
+    color: #e0e0e0 !important;
+}
+
+.select-bg__menu {
+    background-color: #201F1E !important;
+    color: #e0e0e0 !important;
+    border-radius: 10px;
+    border-color: #201F1E !important;
+}
+
+
+.select-bg__menu-list {
+    background-color: #201F1E !important;
+    color: #e0e0e0 !important;
+    border-radius: 10px;
+    border-color: #201F1E !important;
+}
+
+.main-dropdown-item {
+    padding: 1rem 0.25rem;
+    display: block;
+    width: 100%;
+    clear: both;
+    font-weight: 400;
+    text-align: inherit;
+    text-decoration: none;
+    white-space: nowrap;
+    background-color: transparent;
+    border: 0;
+
+}
+
+.main-dropdown-item.active,
+.main-dropdown-item:active {
+
+    text-decoration: none;
+
+}
+
+.main-dropdown-item.disabled,
+.main-dropdown-item:disabled {
+
+    background-color: transparent;
+}
