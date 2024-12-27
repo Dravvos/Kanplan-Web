@@ -28,7 +28,7 @@ function Index() {
                     </p>
 
                     <div className="cta">
-                        <a href="/Login" className="cta-button">
+                        <a href="./Login" className="cta-button">
                             Get Started
                         </a>
 

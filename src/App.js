@@ -11,9 +11,9 @@ function App() {
   return (
     <div className="App">
 
-      <BrowserRouter>
+      <BrowserRouter basename='/KanPlan.Web'>
         <Routes>
-          <Route path="/" element={<Navigate to="/Index" />} />
+          <Route  path="/" element={<Navigate to="/Index" />} />
           <Route path='/Index' element={<Index />} />
           <Route path='/Projects' element={<Projects />} />
           <Route path='/Projects/:id' element={<Project />} />
