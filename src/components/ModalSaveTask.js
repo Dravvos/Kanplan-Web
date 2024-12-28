@@ -23,34 +23,12 @@ import ModalSaveLabel from "./ModalSaveLabel";
 export default function ModalSaveTask({ bucketId, statusComboBoxOptions,
     bucketComboBoxOptions, projectUsers, updatedDate, bucketSelected,
     prioritySelected, statusSelected, task,
-    callbackSuccess, callbackFail
+    callbackSuccess, callbackFail, onClose
 }) {
 
-    const [selectedPriority, setSelectedPriority] = useState([]);  //selected priority in combobox
-    const [selectedStatus, setSelectedStatus] = useState([]);  //selected status in combobox
-    const [editedTask, setEditedTask] = useState(
-        {
-            anexos: [],
-            bucket: null,
-            comentarios: [],
-            dataAlteracao: null,
-            dataInclusao: null,
-            descricao: '',
-            id: null,
-            idTgprioridade: null,
-            idTgstatus: null,
-            nome: '',
-            prioridadeDescricao: '',
-            prioridadeSigla: '',
-            rotulos: [],
-            statusDescricao: '',
-            statusSigla: '',
-            usuarioInclusao: '',
-            usuarioAlteracao: '',
-            usuariosAtrelados: [],
-            usuariosAtreladosIds: []
-        }
-    );
+    const [selectedPriority, setSelectedPriority] = useState(null);  //selected priority in combobox
+    const [selectedStatus, setSelectedStatus] = useState(null);  //selected status in combobox
+    const [editedTask, setEditedTask] = useState(null);
     const [prioritiesOptions, setPrioritiesOptions] = useState([]);//list of priorities of task for combobox
     const [startDate, setStartDate] = useState(new Date()); //start date of task
     const [endDate, setEndDate] = useState(new Date()); //end date of task
@@ -67,9 +45,9 @@ export default function ModalSaveTask({ bucketId, statusComboBoxOptions,
         modal.show();
     }
 
-    const toggleDropdownVisibility = () => {
+    const toggleDropdownVisibility = useCallback(() => {
         setDropdownVisible(!dropdownVisible);
-    }
+    }, [setDropdownVisible, dropdownVisible]);
 
     const addComment = async () => {
 
@@ -149,31 +127,46 @@ export default function ModalSaveTask({ bucketId, statusComboBoxOptions,
 
     function setTaskName(name) {
 
-        setEditedTask({
-            anexos: editedTask.anexos, bucket: editedTask.bucket,
-            comentarios: editedTask.comentarios, dataAlteracao: editedTask.dataAlteracao,
-            dataInclusao: editedTask.dataInclusao, descricao: editedTask.descricao,
-            id: editedTask.id, idTgprioridade: editedTask.idTgprioridade,
-            idTgstatus: editedTask.idTgstatus, nome: name,
-            prioridadeDescricao: editedTask.prioridadeDescricao,
-            prioridadeSigla: editedTask.prioridadeSigla, rotulos: editedTask.rotulos, 
-            statusDescricao: editedTask.statusDescricao, statusSigla: editedTask.statusSigla,
-            usuarioInclusao: editedTask.usuarioInclusao, usuarioAlteracao: editedTask.usuarioAlteracao,
-            usuariosAtrelados: editedTask.usuariosAtrelados, usuariosAtreladosIds: editedTask.usuariosAtreladosIds
-        })
+        if (global.util.isNullOrEmpty(editedTask) === false) {
+            setEditedTask({
+                anexos: editedTask.anexos, bucket: editedTask.bucket,
+                comentarios: editedTask.comentarios, DataInicio: editedTask.dataInicio,
+                DataFim: editedTask.dataFim, dataAlteracao: editedTask.dataAlteracao,
+                dataInclusao: editedTask.dataInclusao, descricao: editedTask.descricao,
+                id: editedTask.id, idTgprioridade: editedTask.idTgprioridade,
+                idTgstatus: editedTask.idTgstatus, nome: name,
+                prioridadeDescricao: editedTask.prioridadeDescricao,
+                prioridadeSigla: editedTask.prioridadeSigla, rotulos: editedTask.rotulos,
+                statusDescricao: editedTask.statusDescricao, statusSigla: editedTask.statusSigla,
+                usuarioInclusao: editedTask.usuarioInclusao, usuarioAlteracao: editedTask.usuarioAlteracao,
+                usuariosAtrelados: editedTask.usuariosAtrelados, usuariosAtreladosIds: editedTask.usuariosAtreladosIds
+            })
+        }
+        else {
+            setEditedTask({
+                descricao: editedTask?.descricao, nome: name,
+            })
+        }
     }
 
     function setTaskDescription(description) {
-        setEditedTask({
-            anexos: editedTask.anexos, bucket: editedTask.bucket, comentarios: editedTask.comentarios,
-            dataAlteracao: editedTask.dataAlteracao, dataInclusao: editedTask.dataInclusao,
-            descricao: description, id: editedTask.id, idTgprioridade: editedTask.idTgprioridade,
-            idTgstatus: editedTask.idTgstatus, nome: editedTask.nome, prioridadeDescricao: editedTask.prioridadeDescricao,
-            prioridadeSigla: editedTask.prioridadeSigla, rotulos: editedTask.rotulos,
-            statusDescricao: editedTask.statusDescricao, statusSigla: editedTask.statusSigla,
-            usuarioInclusao: editedTask.usuarioInclusao, usuarioAlteracao: editedTask.usuarioAlteracao,
-            usuariosAtrelados: editedTask.usuariosAtrelados, usuariosAtreladosIds: editedTask.usuariosAtreladosIds
-        })
+        if (global.util.isNullOrEmpty(editedTask) === false) {
+            setEditedTask({
+                anexos: editedTask.anexos, bucket: editedTask.bucket, comentarios: editedTask.comentarios,
+                dataAlteracao: editedTask.dataAlteracao, dataInclusao: editedTask.dataInclusao,
+                descricao: description, id: editedTask.id, idTgprioridade: editedTask.idTgprioridade,
+                idTgstatus: editedTask.idTgstatus, nome: editedTask.nome, prioridadeDescricao: editedTask.prioridadeDescricao,
+                prioridadeSigla: editedTask.prioridadeSigla, rotulos: editedTask.rotulos,
+                statusDescricao: editedTask.statusDescricao, statusSigla: editedTask.statusSigla,
+                usuarioInclusao: editedTask.usuarioInclusao, usuarioAlteracao: editedTask.usuarioAlteracao,
+                usuariosAtrelados: editedTask.usuariosAtrelados, usuariosAtreladosIds: editedTask.usuariosAtreladosIds
+            })
+        }
+        else {
+            setEditedTask({
+                descricao: description, nome: editedTask?.nome,
+            })
+        }
     }
 
     async function taskCreate() {
@@ -194,7 +187,10 @@ export default function ModalSaveTask({ bucketId, statusComboBoxOptions,
             navigate('Login')
         }
         else {
+
             console.log('error task: ', resp);
+            if (callbackFail)
+                callbackFail();
         }
         global.ui.removeLoading();
     }
@@ -237,7 +233,7 @@ export default function ModalSaveTask({ bucketId, statusComboBoxOptions,
                     const base64File = event.target.result.split(',')[1];
                     const resp = await createAttach({
                         id: null, arquivoBase64: base64File, taskId: editedTask?.id,
-                         usuarioInclusao: getUserEmail(), nomeArquivo: event.target.fileName
+                        usuarioInclusao: getUserEmail(), nomeArquivo: event.target.fileName
                     });
                     if (resp?.status === 200 || resp?.status === 201)
                         global.ui.notification.success('Attach added successfully');
@@ -357,7 +353,7 @@ export default function ModalSaveTask({ bucketId, statusComboBoxOptions,
             $(ul).removeClass('show');
             setIsVisible2(false)
         }
-        else if (event.target.nodeName === "SPAN") {
+        else if (event.target.nodeName === "SPAN" && global.util.guidIsNullOrEmpty(event.target.id) === false) {
             const resp = await assignLabelToTask(editedTask.id, event.target.id);
             if (resp.status === 200) {
                 if (callbackSuccess)
@@ -395,32 +391,40 @@ export default function ModalSaveTask({ bucketId, statusComboBoxOptions,
             $(ul).removeClass('show');
             setIsVisible2(false)
         }
-    }, [navigate, callbackSuccess, dropdownVisible, editedTask?.id]);
+    }, [navigate, callbackSuccess, dropdownVisible, editedTask?.id, toggleDropdownVisibility]);
 
     useEffect(() => {
         fetchPriorities();
         fetchLabels();
-        setSelectedBucket(bucketSelected);
-        setSelectedPriority(prioritySelected);
-        setSelectedStatus(statusSelected);
-        setEditedTask(task);
-
         document.addEventListener('mousedown', handleClickDropdown);
-
         return () => {
-            document.removeEventListener('mousedown', handleClickDropdown)
+            document.removeEventListener('mousedown', handleClickDropdown);
         }
-    }, [fetchPriorities, fetchLabels, handleClickDropdown, task, bucketSelected, prioritySelected, statusSelected])
+    }, [fetchPriorities, fetchLabels, handleClickDropdown])
+
+    useEffect(() => {
+        if (task) setEditedTask(task);
+        else setEditedTask(null);
+
+        if (!bucketSelected) setSelectedBucket(null);
+        else setSelectedBucket(bucketSelected);
+
+        if (prioritySelected) setSelectedPriority(prioritySelected);
+        else setSelectedPriority(null);
+
+        if (statusSelected) setSelectedStatus(statusSelected);
+        else setSelectedStatus(null);
+    }, [task, bucketSelected, prioritySelected, statusSelected])
 
     return (
         <>
-            <div className='modal fade' id="taskModal" tabIndex="-1" aria-hidden="true">
+            <div className='modal fade' id="taskModal" data-bs-backdrop="static" tabIndex="-1" aria-hidden="true">
                 <div className="modal-dialog modal-lg">
                     <div className="modal-content main-modal">
                         <div className="modal-header">
                             <h1 className="modal-title fs-2 main-text" id="taskModalLabel">Save Task</h1>
 
-                            <button type="button" className="btn-close-white btn-close" aria-label="Close"></button>
+                            <button onClick={() => onClose()} type="button" className="btn-close-white btn-close" data-bs-dismiss="modal"></button>
 
                         </div>
                         <span className="main-text text-start ms-4">Last modification made at {updatedDate}</span>
@@ -453,12 +457,12 @@ export default function ModalSaveTask({ bucketId, statusComboBoxOptions,
                                         </button>
                                         <ul aria-labelledby="dropdownUsers" className="dropdown-menu main-dropdown main-text">
                                             {projectUsers.map((item, index) => {
-                                                return <li onClick={() => addUserToTask(item.id, editedTask?.id)} key={index}><a className="main-dropdown-item btn main-text" href="#">
+                                                return <li onClick={() => addUserToTask(item.id, editedTask?.id)} key={index}><button className="main-dropdown-item btn main-text">
                                                     <img style={{
                                                         width: 40, height: 40, borderRadius: '100%', borderWidth: 1,
                                                         borderStyle: 'solid', borderColor: 'white'
                                                     }}
-                                                        alt='' src={"data:image;base64," + item.fotoPerfilBase64} />  {item.nome}</a></li>
+                                                        alt='' src={"data:image;base64," + item.fotoPerfilBase64} />  {item.nome}</button></li>
                                             })}
                                         </ul>
                                     </div>
@@ -514,7 +518,7 @@ export default function ModalSaveTask({ bucketId, statusComboBoxOptions,
                                 <div className="form-group row px-3 mt-4">
                                     <div className="col-12 text-start">
                                         <label htmlFor="txtTaskDescription" className="form-label fs-4 main-text">Task Description</label>
-                                        <textarea style={{ minHeight: 150 }} value={editedTask?.descricao} onChange={(e) => setTaskDescription(e.target.value)} className="ipt"></textarea>
+                                        <textarea style={{ minHeight: 150 }} value={editedTask?.descricao || ''} onChange={(e) => setTaskDescription(e.target.value)} className="ipt"></textarea>
                                     </div>
                                     <div className="col-10">
                                         <div className="input-group"></div>
@@ -548,6 +552,7 @@ export default function ModalSaveTask({ bucketId, statusComboBoxOptions,
                                         <label className="form-label fs-4 main-text">Status *</label>
                                         <Select
                                             value={selectedStatus}
+                                            defaultValue={selectedStatus}
                                             onChange={setSelectedStatus}
                                             options={statusComboBoxOptions}
                                             isClearable={true}
@@ -568,7 +573,7 @@ export default function ModalSaveTask({ bucketId, statusComboBoxOptions,
                                             className="main-text ipt-bg rounded border-0"
                                             locale={navigator.language}
                                             isClearable
-                                            selected={editedTask?.dataInicio ? editedTask.dataInicio : new Date()} onChange={(date) => setStartDate(date)}
+                                            selected={editedTask?.dataInicio ? editedTask.dataInicio : startDate} onChange={(date) => setStartDate(date)}
                                         />
                                     </div>
                                     <div className="col-4 text-start">
@@ -578,7 +583,7 @@ export default function ModalSaveTask({ bucketId, statusComboBoxOptions,
                                             className="main-text ipt-bg rounded border-0"
                                             locale={navigator.language}
                                             isClearable
-                                            selected={editedTask?.dataFim ? editedTask.dataFim : new Date()} onChange={(date) => setEndDate(date)}
+                                            selected={editedTask?.dataFim ? editedTask.dataFim : endDate} onChange={(date) => setEndDate(date)}
                                         />
                                     </div>
                                     <div className="col-10">
@@ -644,7 +649,7 @@ export default function ModalSaveTask({ bucketId, statusComboBoxOptions,
                                 </div>
                             </div>
                             <div className="modal-footer justify-content-between">
-                                <button type="button" className="button-cancel text-start" data-bs-dismiss="modal">Close</button>
+                                <button onClick={() => onClose()} type="button" className="button-cancel text-start" data-bs-dismiss="modal">Close</button>
                                 <button onClick={() => { global.util.isNullOrEmpty(editedTask?.id) ? taskCreate() : taskUpdate() }}
                                     type='button' className='button text-end'>SAVE</button>
                             </div>

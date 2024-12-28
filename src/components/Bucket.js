@@ -17,7 +17,6 @@ import '@fortawesome/fontawesome-free/css/regular.min.css'
 import '@fortawesome/fontawesome-free/css/solid.min.css'
 import { useNavigate } from "react-router-dom";
 import { getUsers } from "../stores/project";
-import { assignLabelToTask } from '../stores/label'
 import { deleteCookie } from "../services/cookie-handler";
 import $ from 'jquery'
 import ModalSaveTask from "./ModalSaveTask";
@@ -29,46 +28,29 @@ export default function Bucket({ bucketId }) {
     const [selectedBucket, setSelectedBucket] = useState(null);
     const [projectUsers, setProjectusers] = useState([]);
     const [bucketName, setBucketName] = useState('');
-    const [startDate, setStartDate] = useState(new Date()); //start date of task
-    const [endDate, setEndDate] = useState(new Date()); //end date of task
     const [status, setStatus] = useState([]); // list of status of task for validation
     const [statusOptions, setStatusOptions] = useState([]); //list of status of task for combobox
     const [selectedPriority, setSelectedPriority] = useState([]);  //selected priority in combobox
     const [bucketOptions, setBucketOptions] = useState([]); //list of buckets for combobox
     const [selectedStatus, setSelectedStatus] = useState([]);  //selected status in combobox
     const [updatedDate, setUpdatedDate] = useState(''); //date when task was modified
-    const [editedTask, setEditedTask] = useState(
-        {
-            anexos: [],
-            bucket: null,
-            comentarios: [],
-            dataAlteracao: null,
-            dataInclusao: null,
-            descricao: '',
-            id: null,
-            idTgprioridade: null,
-            idTgstatus: null,
-            nome: '',
-            prioridadeDescricao: '',
-            prioridadeSigla: '',
-            rotulos: [],
-            statusDescricao: '',
-            statusSigla: '',
-            usuarioInclusao: '',
-            usuarioAlteracao: '',
-            usuariosAtrelados: [],
-            usuariosAtreladosIds: []
-        }
-    );
+    const [editedTask, setEditedTask] = useState(null);
     const [isVisible, setIsVisible] = useState(false);
     const [showModal, setShowModal] = useState(false); // State to control modal visibility
 
     const popoverRef = useRef(null);
+    const [position, setPosition] = useState({ top: 0, left: 0 }); // Div position
+    const buttonRefs = useRef([]); // Array de refs para os botões
 
     const navigate = useNavigate();
 
-    const toggleVisibility = () => {
+    const toggleVisibility = (index) => {
         setIsVisible(!isVisible);
+        const buttonRect = buttonRefs.current[index].getBoundingClientRect();
+        setPosition({
+            top: buttonRect.bottom,
+            left: buttonRect.right - 20,
+        })
     };
 
     const fetchBucket = useCallback(async () => {
@@ -155,6 +137,7 @@ export default function Bucket({ bucketId }) {
     }, [navigate]);
 
     useEffect(() => {
+
         fetchBucket();
         fetchTasks();
         fetchStatus();
@@ -164,7 +147,9 @@ export default function Bucket({ bucketId }) {
         } else {
             document.removeEventListener('mousedown', handleClickOutside);
         }
-
+        $('#taskModal').on('hidden.bs.modal', async function () {
+            await clearFields();
+        });
         return () => {
             document.removeEventListener('mousedown', handleClickOutside);
         };
@@ -172,22 +157,18 @@ export default function Bucket({ bucketId }) {
 
     function handleEditTask(task) {
         setEditedTask(task);
-        setStartDate(task.dataInicio);
-        setEndDate(task.dataFim);
         setSelectedPriority({ value: task.idTgprioridade, label: task.prioridadeDescricao });
         setSelectedStatus({ value: task.idTgstatus, label: task.statusDescricao });
 
         if (global.util.isNullOrEmpty(task.dataAlteracao) === false)
-            setUpdatedDate(new Date(task.dataAlteracao + "Z").toLocaleString(navigator.language))
+            setUpdatedDate(new Date(task.dataAlteracao).toLocaleString(navigator.language))
     }
 
-    function clearFields() {
-        setEditedTask(null);
-        setStartDate(new Date());
-        setEndDate(new Date());
-        setSelectedPriority(null);
-        setSelectedStatus(null);
-        setUpdatedDate(null);
+    async function clearFields() {
+        await setEditedTask(null);
+        await setSelectedPriority(null);
+        await setSelectedStatus(null);
+        await setUpdatedDate(null);
     }
 
     async function updateTaskStatus(taskId) {
@@ -199,10 +180,10 @@ export default function Bucket({ bucketId }) {
         const statusFinished = status.find(x => x.sigla === "COMP");
         const statusPending = status.find(x => x.sigla === "PEND");
 
-        if (task.idTGStatus === statusFinished.id)
-            task.idTGStatus = statusPending.id
+        if (task.idTgstatus === statusFinished.id)
+            task.idTgstatus = statusPending.id
         else
-            task.idTGStatus = statusFinished.id;
+            task.idTgstatus = statusFinished.id;
 
         task.usuarioAlteracao = getUserEmail();
 
@@ -220,7 +201,7 @@ export default function Bucket({ bucketId }) {
     }
 
     const handleClickOutside = (event) => {
-        if (popoverRef.current && !popoverRef.current.contains(event.target)) {
+        if (popoverRef?.current && !popoverRef?.current.contains(event.target)) {
             setIsVisible(false);
         }
     }
@@ -298,7 +279,22 @@ export default function Bucket({ bucketId }) {
         }
     }
 
+    async function openModalEdit(modalId, task) {
+        handleEditTask(task)
+
+        await setShowModal(true);
+        var modalElement = $('#' + modalId);
+        if (modalElement.length > 0) {
+            var modal = new bootstrap.Modal(modalElement[0]);
+            modal.show();
+        } else {
+            console.error('Modal element with id ' + modalId + ' not found.');
+        }
+    }
+
     async function openModal(modalId) {
+
+        await setEditedTask(null);
         await setShowModal(true);
         var modalElement = $('#' + modalId);
         if (modalElement.length > 0) {
@@ -319,11 +315,10 @@ export default function Bucket({ bucketId }) {
                 </div>
 
                 <div className='mt-2'>
-                    <button onClick={() => { clearFields(); openModal('taskModal') }} type="button" className='w-100 btn button-add-task main-text'>
+                    <button onClick={() => { openModal('taskModal', null, true) }} type="button" className='w-100 btn button-add-task main-text'>
                         <i className='fa fa-plus'></i>
                         Add Task
                     </button>
-                    <i role="button" onClick={()=> setTasks(tasks.sort())} className="fa fa-arrow-up main-text"></i>
                 </div>
             </div>
 
@@ -341,8 +336,8 @@ export default function Bucket({ bucketId }) {
                                             ref={popoverRef}
                                             style={{
                                                 position: 'absolute',
-                                                top: 'calc(30% + 10px)',  // Positioned below the button
-                                                left: '15%',
+                                                top: position.top + 'px',  // Positioned below the button
+                                                left: position.left + 'px',
                                                 marginTop: '5px',
                                                 padding: '10px',
                                                 border: '1px solid #ccc',
@@ -352,7 +347,7 @@ export default function Bucket({ bucketId }) {
                                             }}
                                         >
                                             <div className="row px-3 justify-content-center">
-                                                <button onClick={() => { handleEditTask(task); openModal("taskModal") }} className="btn main-bg mb-2 main-text"><i className="fa fa-pen-to-square"></i> Editar</button>
+                                                <button onClick={() => { openModalEdit("taskModal", task) }} className="btn main-bg mb-2 main-text"><i className="fa fa-pen-to-square"></i> Editar</button>
                                                 <button onClick={() => confirmDeleteTask(task.id)} className="btn main-bg mt-3 main-text"><i className="fa fa-trash"></i> Excluir</button>
                                             </div>
 
@@ -364,7 +359,7 @@ export default function Bucket({ bucketId }) {
                                             backgroundColor: rotulo.cor
                                         }}>{rotulo.nome}</label>
                                     )) : ""}
-                                    <i role='button' onClick={toggleVisibility} className="fa fa-ellipsis main-text ms-2 w-100 text-end"
+                                    <i ref={(el) => (buttonRefs.current[index] = el)} role='button' onClick={() => toggleVisibility(index)} className="fa fa-ellipsis main-text ms-2 w-100 text-end"
                                     ></i>
 
                                 </div>
@@ -414,15 +409,23 @@ export default function Bucket({ bucketId }) {
                         projectUsers={projectUsers} statusComboBoxOptions={statusOptions}
                         bucketSelected={selectedBucket} prioritySelected={selectedPriority}
                         updatedDate={updatedDate} statusSelected={selectedStatus} task={editedTask}
-
+                        onClose={() => {
+                            setEditedTask(null);
+                            setSelectedPriority(null);
+                            setSelectedStatus(null);
+                            setUpdatedDate(null);
+                        }}
                         callbackSuccess={async () => {
                             await fetchTasks();
-                            getTask(editedTask.id).then(res => {
+                            getTask(editedTask?.id).then(res => {
                                 if (res.status === 200)
                                     handleEditTask(res.data)
                             })
                         }} />
-                )}
+
+                )
+
+            }
         </div>
     )
 }

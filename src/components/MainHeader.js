@@ -65,7 +65,7 @@ export default function Header() {
             <header className="border-bottom px-4">
                 <nav className="navbar navbar-expand-lg ">
                     <div className="container-fluid">
-                        <a className="navbar-brand main-text" href="#">Kanplan</a>
+                        <span className="navbar-brand main-text">Kanplan</span>
                         <button className="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
                             <span className="navbar-toggler-icon"></span>
                         </button>
@@ -78,7 +78,7 @@ export default function Header() {
                                     <a className="nav-link main-text" href="../Projects">Projects</a>
                                 </li>
                                 <li className="nav-item">
-                                    <a data-bs-toggle="modal" data-bs-target="#createProjectModal" className="nav-link main-text" href="#">Create Project</a>
+                                    <button data-bs-toggle="modal" data-bs-target="#createProjectModal" className="nav-link main-text">Create Project</button>
 
                                 </li>
                             </ul>

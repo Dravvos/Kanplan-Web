@@ -118,7 +118,7 @@ function Login() {
                             </div>
                         </form>
                         <p className="forgot-password">Forgot your password? <a className='link' href="#">Click here</a></p>
-                        <p className="forgot-password">Don't have an account? <a className='link' href='#' onClick={() => handleStepChange(2)}>Sign Up</a></p>
+                        <p className="forgot-password">Don't have an account? <button className='link btn' href='#' onClick={() => handleStepChange(2)}>Sign Up</button></p>
                         <footer className="footer">
                             <p>&copy; 2024 KanPlan. All rights reserved.</p>
                         </footer>
@@ -164,7 +164,7 @@ function Login() {
                                 <button onClick={signUpUser} type='button' className='button'>SIGNUP</button>
                             </div>
                         </form>
-                        <p className="forgot-password">Already have an account? <a className='link' href='#' onClick={() => handleStepChange(1)}>Log in</a></p>
+                        <p className="forgot-password">Already have an account? <button className='link btn' onClick={() => handleStepChange(1)}>Log in</button></p>
                         <footer className="footer">
                             <p>&copy; 2024 KanPlan. All rights reserved.</p>
                         </footer>
