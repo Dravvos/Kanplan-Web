@@ -180,52 +180,6 @@ var global = (function () {
             return _u.isNull(obj) || obj.trim() === "";
         };
 
-        _u.toDateTime = function (datetime) {
-            if (!datetime) return "";
-            if (datetime.toString().indexOf("\/") > -1) {
-                datetime = global.util.replaceAll(datetime, "\\/", "");
-                datetime = eval("new " + datetime);
-            }
-            var d = new Date(datetime);
-            var datestring = _u.pad(d.getDate(), 2) + "/" + _u.pad(d.getMonth() + 1, 2) + "/" + d.getFullYear() + " " +
-                _u.pad(d.getHours(), 2) + ":" + _u.pad(d.getMinutes(), 2) + ":" + _u.pad(d.getSeconds(), 2);
-            return datestring;
-        };
-
-        _u.getTime = function (datetime) {
-            if (!datetime) return "";
-            if (datetime.toString().indexOf("\/") > -1) {
-                datetime = global.util.replaceAll(datetime, "\\/", "");
-                datetime = eval("new " + datetime);
-            }
-            var d = new Date(datetime);
-            var datestring = _u.pad(d.getHours(), 2) + ":" + _u.pad(d.getMinutes(), 2) + ":" + _u.pad(d.getSeconds(), 2);
-            return datestring;
-        };
-
-        _u.toShortDateTime = function (datetime) {
-            if (!datetime) return "";
-            if (datetime.toString().indexOf("\/") > -1) {
-                datetime = global.util.replaceAll(datetime, "\\/", "");
-                datetime = eval("new " + datetime);
-            }
-
-            var d = new Date(datetime);
-            var datestring = _u.pad(d.getDate(), 2) + "/" + _u.pad(d.getMonth() + 1, 2) + "/" + d.getFullYear();
-            return datestring;
-        };
-        
-        _u.toDateUSA = function (dateBr) {
-            if (!dateBr) return "";
-            if (dateBr.indexOf("\/") > -1) {
-                dateBr = global.util.replaceAll(dateBr, "\\/", "");
-            }
-            var d = dateBr.substring(0, 2);
-            var m = dateBr.substring(2, 4);
-            var y = dateBr.substring(4, 8);
-            return Date(m + "/" + d + "/" + y);
-        };
-
         _u.guidIsNullOrEmpty = function (guid) {
             return _u.isNullOrEmpty(guid) || guid === "00000000-0000-0000-0000-000000000000";
         };

@@ -117,7 +117,7 @@ function Login() {
                                 <button onClick={loginUser} type='button' className='button'>LOGIN</button>
                             </div>
                         </form>
-                        <p className="forgot-password">Forgot your password? <a className='link' href="#">Click here</a></p>
+                        <p className="forgot-password">Forgot your password? <button className='link btn' >Click here</button></p>
                         <p className="forgot-password">Don't have an account? <button className='link btn' href='#' onClick={() => handleStepChange(2)}>Sign Up</button></p>
                         <footer className="footer">
                             <p>&copy; 2024 KanPlan. All rights reserved.</p>

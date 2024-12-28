@@ -8,7 +8,7 @@ const getToken = () => {
 }
 
 export const api = axios.create({
-  baseURL: "https://localhost:44311/api/"
+  baseURL: "https://www.danieloliveira.net.br/KanPlan.API/api/"
 })
 
 api.interceptors.request.use((request) => {
