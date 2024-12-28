@@ -5,8 +5,10 @@ const getToken = () => {
   return getCookie("kanplan_token")  
 }
 
+const url = process.env.REACT_APP_API_URL || "https://www.danieloliveira.net.br/KanPlan.API/api/";
+
 export const api = axios.create({
-  baseURL: "https://www.danieloliveira.net.br/KanPlan.API/api/"
+  baseURL: url
 })
 
 api.interceptors.request.use((request) => {

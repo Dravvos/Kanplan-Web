@@ -1,17 +1,17 @@
 import '../App.css';
 import { useEffect } from 'react';
 import { isAuthenticated } from '../stores/user';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, Link } from 'react-router-dom';
 
 function Index() {
 
     const navigate = useNavigate();
 
-    useEffect(()=>{
+    useEffect(() => {
         if (isAuthenticated() === true) {
             navigate('/Projects');
         }
-    },[navigate])
+    }, [navigate])
 
     return (
         <div className='body'>
@@ -20,7 +20,7 @@ function Index() {
 
                     <h1>Welcome to Your Kanban Board</h1>
                     <p className="tagline">Stay organized and boost your productivity with ease!</p>
-                    
+
                 </header>
 
                 <main className="main-content">
@@ -30,10 +30,7 @@ function Index() {
                     </p>
 
                     <div className="cta">
-                        <a href="./Login" className="cta-button">
-                            Get Started
-                        </a>
-
+                        <Link className='cta-button' to='/Login'>Get Started</Link>
                     </div>
                 </main>
 
