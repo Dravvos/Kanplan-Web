@@ -17,8 +17,10 @@ function Index() {
         <div className='body'>
             <div className="container">
                 <header className="header">
+
                     <h1>Welcome to Your Kanban Board</h1>
                     <p className="tagline">Stay organized and boost your productivity with ease!</p>
+                    
                 </header>
 
                 <main className="main-content">

@@ -1,10 +1,8 @@
 import axios from "axios"
 import { getCookie } from "./cookie-handler"
 
-const getToken = () => {
-  
-  return getCookie("kanplan_token")
-  
+const getToken = () => {  
+  return getCookie("kanplan_token")  
 }
 
 export const api = axios.create({
