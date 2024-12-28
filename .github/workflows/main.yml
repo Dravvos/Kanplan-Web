@@ -30,7 +30,7 @@ jobs:
 
     steps:
     - name: Checkout code
-      uses: actions/checkout@v2
+      uses: actions/setup-node@v4
 
     - name: Create tarball
       run: tar --no-same-permissions -cvf publish.tar ./build
@@ -41,7 +41,7 @@ jobs:
         host: ${{ secrets.VM_HOST }}
         username: ${{ secrets.VM_USERNAME }}
         password: ${{ secrets.VM_PASSWORD }}
-        source: './build'
+        source: './publish.tar'
         target: '/var/www/html/KanPlan.Web'
         port: 22
         
