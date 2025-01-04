@@ -39,7 +39,7 @@ export default function Bucket({ bucketId }) {
     const [showModal, setShowModal] = useState(false); // State to control modal visibility
 
     const popoverRef = useRef(null);
-    const [position, setPosition] = useState({ top: 0, left: 0 }); // Div position
+    const [position, setPosition] = useState({ top: 0, left: 0, task: null }); // Div position
     const buttonRefs = useRef([]); // Array de refs para os botões
 
     const navigate = useNavigate();
@@ -50,6 +50,7 @@ export default function Bucket({ bucketId }) {
         setPosition({
             top: buttonRect.bottom,
             left: buttonRect.right - 20,
+            task: tasks[index]
         })
     };
 
@@ -137,7 +138,10 @@ export default function Bucket({ bucketId }) {
     }, [navigate]);
 
     useEffect(() => {
-
+        const tooltipTriggerList = document.querySelectorAll('[data-bs-toggle="tooltip"]')
+        let tooltipList = [...tooltipTriggerList].map(tooltipTriggerEl => new bootstrap.Tooltip(tooltipTriggerEl));
+        
+        
         fetchBucket();
         fetchTasks();
         fetchStatus();
@@ -155,10 +159,10 @@ export default function Bucket({ bucketId }) {
         };
     }, [bucketId, isVisible, fetchBucket, fetchTasks, fetchStatus])
 
-    function handleEditTask(task) {
-        setEditedTask(task);
-        setSelectedPriority({ value: task.idTgprioridade, label: task.prioridadeDescricao });
-        setSelectedStatus({ value: task.idTgstatus, label: task.statusDescricao });
+    async function handleEditTask(task) {
+        await setEditedTask(task);
+        await setSelectedPriority({ value: task.idTgprioridade, label: task.prioridadeDescricao });
+        await setSelectedStatus({ value: task.idTgstatus, label: task.statusDescricao });
 
         if (global.util.isNullOrEmpty(task.dataAlteracao) === false)
             setUpdatedDate(new Date(task.dataAlteracao).toLocaleString(navigator.language))
@@ -219,10 +223,10 @@ export default function Bucket({ bucketId }) {
                     deleteCookie('kanplan_token')
                     navigate('Login')
                 }
-                else
 
-
+                setTimeout(() => {
                     global.ui.removeLoading();
+                }, 300);
             }
         )
     }
@@ -280,7 +284,7 @@ export default function Bucket({ bucketId }) {
     }
 
     async function openModalEdit(modalId, task) {
-        handleEditTask(task)
+        await handleEditTask(task)
 
         await setShowModal(true);
         var modalElement = $('#' + modalId);
@@ -316,7 +320,7 @@ export default function Bucket({ bucketId }) {
 
                 <div className='mt-2'>
                     <button onClick={() => { openModal('taskModal', null, true) }} type="button" className='w-100 btn button-add-task main-text'>
-                        <i className='fa fa-plus'></i>
+                        <i className='fa fa-plus'></i> &nbsp;
                         Add Task
                     </button>
                 </div>
@@ -347,8 +351,8 @@ export default function Bucket({ bucketId }) {
                                             }}
                                         >
                                             <div className="row px-3 justify-content-center">
-                                                <button onClick={() => { openModalEdit("taskModal", task) }} className="btn main-bg mb-2 main-text"><i className="fa fa-pen-to-square"></i> Editar</button>
-                                                <button onClick={() => confirmDeleteTask(task.id)} className="btn main-bg mt-3 main-text"><i className="fa fa-trash"></i> Excluir</button>
+                                                <button onClick={() => { openModalEdit("taskModal", position.task) }} className="btn main-bg mb-2 main-text"><i className="fa fa-pen-to-square"></i> Editar</button>
+                                                <button onClick={() => confirmDeleteTask(position.task.id)} className="btn main-bg mt-3 main-text"><i className="fa fa-trash"></i> Excluir</button>
                                             </div>
 
                                         </div>
@@ -356,10 +360,10 @@ export default function Bucket({ bucketId }) {
                                     {task.rotulos ? task.rotulos.map((rotulo, index) => (
                                         <label key={index} className="label mx-1" style={{
                                             color: rotulo.cor.includes('0') ? 'black' : 'white',
-                                            backgroundColor: rotulo.cor
+                                            backgroundColor: rotulo.cor,
                                         }}>{rotulo.nome}</label>
                                     )) : ""}
-                                    <i ref={(el) => (buttonRefs.current[index] = el)} role='button' onClick={() => toggleVisibility(index)} className="fa fa-ellipsis main-text ms-2 w-100 text-end"
+                                    <i ref={(el) => (buttonRefs.current[index] = el)} role='button' onClick={() => toggleVisibility(index)} className="fa fa-ellipsis main-text ms-2 text-end w-100"
                                     ></i>
 
                                 </div>
@@ -369,10 +373,17 @@ export default function Bucket({ bucketId }) {
                                 </div>
 
                                 <div className="mt-3 text-start">
-                                    {
-                                        task.prioridadeSigla === "URGT" ? <i className="fa-solid fa-bell text-danger"></i> :
-                                            task.prioridadeSigla === "HIGH" ? <i className="fa fa-exclamation text-danger"></i> : ""
-                                    }
+                                    <>
+                                        {
+                                            task.statusSigla === "PGRS" ?
+                                                <i data-bs-toggle="tooltip" data-bs-title="In Progress" className="fa fa-circle-half-stroke main-text me-3"></i> :
+                                                ''
+                                        }
+                                        {
+                                            task.prioridadeSigla === "URGT" ? <i data-bs-toggle="tooltip" data-bs-title="Urgent" className="fa-solid fa-bell text-danger"></i> :
+                                                task.prioridadeSigla === "HIGH" ? <i data-bs-toggle="tooltip" data-bs-title="High" className="fa fa-exclamation text-danger"></i> : ""
+                                        }
+                                    </>
                                 </div>
                             </div>
                             <div className='task-footer d-flex justify-content-between'>
@@ -393,8 +404,8 @@ export default function Bucket({ bucketId }) {
 
 
                             </div>
-
                         </div>
+
                     ))
                 ) : (
                     <div></div>

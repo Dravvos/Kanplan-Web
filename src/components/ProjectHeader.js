@@ -2,14 +2,17 @@ import { React, useState, useEffect, useCallback } from "react";
 import '../styles/Project.css'
 import 'bootstrap'
 import '@fortawesome/fontawesome-free/css/fontawesome.min.css'
-import { getProject } from "../stores/project";
+import { assignUserToProject, getProject } from "../stores/project";
 import { deleteCookie } from "../services/cookie-handler";
 import { useNavigate } from "react-router-dom";
+import global from "../stores/global";
+import { get } from '../services/api-handler'
 
 export default function ProjectHeader(projeto) {
 
+    const [emails, setEmails] = useState('');
     const [project, setProject] = useState(null);
-    const navigate =useNavigate();
+    const navigate = useNavigate();
 
     const getProjectById = useCallback(async () => {
 
@@ -17,7 +20,7 @@ export default function ProjectHeader(projeto) {
 
         if (resp?.status === 200) {
             setProject(resp.data);
-        } 
+        }
         else if (resp.status === 401) {
             deleteCookie('kanplan_token')
             navigate('Login')
@@ -31,8 +34,31 @@ export default function ProjectHeader(projeto) {
         getProjectById();
     }, [getProjectById])
 
-    function shareProject() {
+    async function shareProject() {
+        if(emails.includes(',')===false)
+        {
+            global.ui.notification.warning('The separator character is ","');
+            return;
+        }
+        let userEmails = emails.split(',');
+        let userIds = [];
+        userEmails.forEach(async (item) => {
+            try {
+                const resp = await get('User/' + item.trim());
+                if (resp.status === 200) {
+                    userIds.push(resp.data?.id)
+                }
+            }
+            catch (err) {
+                console.error(err);
+            }
+        });
 
+        for (let i = 0; i < userIds.length; i++) {
+            await assignUserToProject(userIds[i], projeto.projectId);
+        }
+
+        global.ui.notification.success('User(s) added to project');
     }
 
     return (
@@ -47,7 +73,7 @@ export default function ProjectHeader(projeto) {
                         <div className="collapse navbar-collapse justify-content-end" id="navbarSupportedContent">
 
                             <button data-bs-toggle="modal" data-bs-target="#shareProjectModal" className="btn btn-outline-secondary main-text">
-                                <i className="fa fa-user-plus"></i> Compartilhar</button>
+                                <i className="fa fa-user-plus"></i> Add users</button>
                         </div>
                     </div>
                 </nav>
@@ -57,10 +83,10 @@ export default function ProjectHeader(projeto) {
                 <div className="modal-dialog">
                     <div className="modal-content main-modal">
                         <div className="modal-body">
-                            <p>Type the email of the user you want to share.</p>
-                            <p>To share with more users, separate the emails with comma</p>
-                            <input className="ipt" type='text' placeholder="user email" />
-                            <button type="button" className="button-cancel" onClick={shareProject}>Share</button>
+                            <p className="main-text">Type the email of the user you want to share.</p>
+                            <p className="main-text">To share with more users, separate the emails with comma</p>
+                            <input onChange={(e) => setEmails(e.target.value)} className="ipt" type='email' placeholder="user email" />
+                            <button type="button" className="button mt-4" onClick={shareProject}>Share</button>
                         </div>
                     </div>
                 </div>

@@ -39,6 +39,7 @@ export default function ModalSaveTask({ bucketId, statusComboBoxOptions,
     const [labels, setLabels] = useState([]);
     const [dropdownVisible, setDropdownVisible] = useState(false);
     const navigate = useNavigate();
+    const [editMode, setEditMode] = useState(false);
 
     function openModal(modalId) {
         var modal = new bootstrap.Modal($('#' + modalId)[0]);
@@ -192,7 +193,14 @@ export default function ModalSaveTask({ bucketId, statusComboBoxOptions,
             if (callbackFail)
                 callbackFail();
         }
-        global.ui.removeLoading();
+        setTimeout(() => {
+            global.ui.removeLoading();
+            const taskModal = $('#taskModal')[0];
+            const modal = new bootstrap.Modal(taskModal);
+            modal.hide();
+            modal.dispose();
+        }, 800);
+
     }
 
     async function taskUpdate() {
@@ -216,7 +224,9 @@ export default function ModalSaveTask({ bucketId, statusComboBoxOptions,
 
             console.log('error task: ', resp);
         }
-        global.ui.removeLoading();
+        setTimeout(() => {
+            global.ui.removeLoading();
+        }, 800);
     }
 
     function addAttach(files) {
@@ -353,35 +363,42 @@ export default function ModalSaveTask({ bucketId, statusComboBoxOptions,
             $(ul).removeClass('show');
             setIsVisible2(false)
         }
-        else if (event.target.nodeName === "SPAN" && global.util.guidIsNullOrEmpty(event.target.id) === false) {
-            const resp = await assignLabelToTask(editedTask.id, event.target.id);
-            if (resp.status === 200) {
-                if (callbackSuccess)
-                    callbackSuccess()
+        else if (event.target.nodeName === "SPAN" && global.util.guidIsNullOrEmpty(event.target?.id) === false) {
+            if (editedTask?.id) {
+                const resp = await assignLabelToTask(editedTask.id, event.target.id);
+                if (resp.status === 200) {
+                    if (callbackSuccess)
+                        callbackSuccess()
+                }
+                else if (resp.status === 401) {
+                    deleteCookie('kanplan_token');
+                    navigate('/Login');
+                }
+                else if (resp.status === 400)
+                    console.error('error assigning label to task: ', resp);
+                setIsVisible2(false)
             }
-            else if (resp.status === 401) {
-                deleteCookie('kanplan_token');
-                navigate('/Login');
-            }
-            else if (resp.status === 400)
-                console.error('error assigning label to task: ', resp);
-            setIsVisible2(false)
         }
         else if (event.target.className?.includes('labelName')) {
-            const resp = await assignLabelToTask(editedTask.id, event.target.children[0].id);
-            if (resp.status === 200) {
-                if (callbackSuccess)
-                    callbackSuccess()
+            if (editedTask?.id) {
+                const resp = await assignLabelToTask(editedTask.id, event.target.children[0].id);
+                if (resp.status === 200) {
+                    if (callbackSuccess)
+                        callbackSuccess()
+                }
+                else if (resp.status === 401) {
+                    deleteCookie('kanplan_token');
+                    navigate('/Login');
+                }
+                else if (resp.status === 400)
+                    console.error('error assigning label to task: ', resp);
+                setIsVisible2(false)
             }
-            else if (resp.status === 401) {
-                deleteCookie('kanplan_token');
-                navigate('/Login');
-            }
-            else if (resp.status === 400)
-                console.error('error assigning label to task: ', resp);
-            setIsVisible2(false)
         }
         else if (event.target.nodeName === "UL") {
+            //makes nothing
+        }
+        else if (event.target.parentElement.nodeName === "BUTTON") {
             //makes nothing
         }
         else {
@@ -403,7 +420,13 @@ export default function ModalSaveTask({ bucketId, statusComboBoxOptions,
     }, [fetchPriorities, fetchLabels, handleClickDropdown])
 
     useEffect(() => {
-        if (task) setEditedTask(task);
+        setEditMode(false);
+        if (task) {
+            setEditedTask(task);
+            setStartDate(task.dataInicio);
+            setEndDate(task.dataFim);
+            setEditMode(true);
+        }
         else setEditedTask(null);
 
         if (!bucketSelected) setSelectedBucket(null);
@@ -427,7 +450,7 @@ export default function ModalSaveTask({ bucketId, statusComboBoxOptions,
                             <button onClick={() => onClose()} type="button" className="btn-close-white btn-close" data-bs-dismiss="modal"></button>
 
                         </div>
-                        <span className="main-text text-start ms-4">Last modification made at {updatedDate}</span>
+                        {editMode && <span className="main-text text-start ms-4">Last modification made at {updatedDate}</span>}
                         <form>
                             <div className="modal-body">
                                 <div className="form-group row px-3">
@@ -439,82 +462,89 @@ export default function ModalSaveTask({ bucketId, statusComboBoxOptions,
                                         <div className="input-group"></div>
                                     </div>
                                 </div>
-                                <div id='listOfUsers' className="form-group row px-3">
-                                    <div className="col-12 text-start dropdown">
 
-                                        <button id="dropdownUsers" type="button" className="dropdown-toggle btn main-bg col-12 text-start"
-                                            data-bs-toggle="dropdown" aria-expanded="false"
-                                            data-bs-offset="25,5"  >
-                                            <i id='btnAddUser' className="fa fa-user-plus main-text me-3"></i>
-                                            {
-                                                editedTask?.usuariosAtrelados?.length > 0 ?
-                                                    editedTask.usuariosAtrelados.map((item, index) => {
-                                                        return <span className="main-text" key={index}>{item.nome}
-                                                            <i role="button" onClick={() => removeUserFromTask(editedTask?.id, item.id)} className="ms-2 fa fa-xmark"></i>
-                                                        </span>
-                                                    }) : <span className="main-text">Assign</span>}
+                                {editMode && (
+                                    <>
+                                        <div id='listOfUsers' className="form-group row px-3">
+                                            <div className="col-12 text-start dropdown">
 
-                                        </button>
-                                        <ul aria-labelledby="dropdownUsers" className="dropdown-menu main-dropdown main-text">
-                                            {projectUsers.map((item, index) => {
-                                                return <li onClick={() => addUserToTask(item.id, editedTask?.id)} key={index}><button className="main-dropdown-item btn main-text">
-                                                    <img style={{
-                                                        width: 40, height: 40, borderRadius: '100%', borderWidth: 1,
-                                                        borderStyle: 'solid', borderColor: 'white'
-                                                    }}
-                                                        alt='' src={"data:image;base64," + item.fotoPerfilBase64} />  {item.nome}</button></li>
-                                            })}
-                                        </ul>
-                                    </div>
-                                </div>
-                                <div role='group' className="form-group pt-3 row px-3 me-4" >
-                                    <div className="btn-group col-12 text-start ms-4 label-list" role='button' id="dropdownLabels" onClick={() => setIsVisible2(!isVisible2)} aria-expanded="false">
-                                        <div className="dropdown" id='listOfLabels'>
-                                            <i className="fa fa-tag main-text me-2"></i>
-                                            {editedTask?.rotulos?.length > 0 ? editedTask?.rotulos?.map((label, index) => {
-                                                return <label className="label mx-1" key={index}
-                                                    style={{
-                                                        background: label.cor, fontSize: 14,
-                                                        color: label.cor.includes('0') ? 'black' : 'white'
-                                                    }}>
-                                                    {label.nome}
-                                                    <i role="button"
-                                                        onClick={() => removeLabelFromTask(label.id)}
-                                                        className="fa fa-xmark text-white ms-2"></i>
-                                                </label>
-                                            }) : ''}
+                                                <button id="dropdownUsers" type="button" className="dropdown-toggle btn main-bg col-12 text-start"
+                                                    data-bs-toggle="dropdown" aria-expanded="false"
+                                                    data-bs-offset="25,5"  >
+                                                    <i id='btnAddUser' className="fa fa-user-plus main-text me-3"></i>
+                                                    {
+                                                        editedTask?.usuariosAtrelados?.length > 0 ?
+                                                            editedTask.usuariosAtrelados.map((item, index) => {
+                                                                return <span className="main-text" key={index}>{item.nome}
+                                                                    <i role="button" onClick={() => removeUserFromTask(editedTask?.id, item.id)} className="ms-2 fa fa-xmark"></i>
+                                                                </span>
+                                                            }) : <span className="main-text">Assign</span>}
 
-                                            <ul className="dropdown-menu main-dropdown overflow-y-small" aria-labelledby="dropdownLabels">
-                                                {labels.map((item, index) => {
-                                                    return (
-                                                        <li key={index}>
-                                                            <div className="main-dropdown-item d-flex">
-                                                                <div className="col-10 labelName">
-                                                                    <span className="px-2 py-1 rounded-1 ms-2" id={item.id} style={{ color: item.cor.includes('0') ? 'black' : 'white', background: item.cor }} >
-                                                                        {item.nome}
-                                                                    </span>
-                                                                </div>
-                                                                <div className="col-2">
-                                                                    <button style={{ background: 'transparent', border: 0, outline: 0 }} type="button"
-                                                                        className="main-text"
-                                                                        onClick={() => {
-                                                                            setLabelName(item.nome)
-                                                                            setLabelId(item.id);
-                                                                            openModal('labelModal')
-                                                                        }} >
-                                                                        <i className="fa fa-pen main-text" >
-                                                                        </i>
-                                                                    </button>
-                                                                </div>
-                                                            </div>
-                                                        </li>
-                                                    )
-                                                })}
-                                            </ul>
-
+                                                </button>
+                                                <ul aria-labelledby="dropdownUsers" className="dropdown-menu main-dropdown main-text">
+                                                    {projectUsers.map((item, index) => {
+                                                        return <li onClick={() => addUserToTask(item.id, editedTask?.id)} key={index}><button className="main-dropdown-item btn main-text">
+                                                            <img style={{
+                                                                width: 40, height: 40, borderRadius: '100%', borderWidth: 1,
+                                                                borderStyle: 'solid', borderColor: 'white'
+                                                            }}
+                                                                alt='' src={"data:image;base64," + item.fotoPerfilBase64} />  {item.nome}</button></li>
+                                                    })}
+                                                </ul>
+                                            </div>
                                         </div>
-                                    </div>
-                                </div>
+
+                                        <div role='group' className="form-group pt-3 row px-3 me-4" >
+                                            <div className="btn-group col-12 text-start ms-4 label-list" role='button' id="dropdownLabels" onClick={() => setIsVisible2(!isVisible2)} aria-expanded="false">
+                                                <div className="dropdown" id='listOfLabels'>
+                                                    <i className="fa fa-tag main-text me-2"></i>
+                                                    {editedTask?.rotulos?.length > 0 ? editedTask?.rotulos?.map((label, index) => {
+                                                        return <label className="label mx-1" key={index}
+                                                            style={{
+                                                                background: label.cor, fontSize: 14,
+                                                                color: label.cor.includes('0') ? 'black' : 'white'
+                                                            }}>
+                                                            {label.nome}
+                                                            <i role="button"
+                                                                onClick={() => removeLabelFromTask(label.id)}
+                                                                className="fa fa-xmark text-white ms-2"></i>
+                                                        </label>
+                                                    }) : ''}
+
+                                                    <ul className="dropdown-menu main-dropdown overflow-y-small" aria-labelledby="dropdownLabels">
+                                                        {labels.map((item, index) => {
+                                                            return (
+                                                                <li key={index}>
+                                                                    <div className="main-dropdown-item d-flex">
+                                                                        <div className="col-10 labelName">
+                                                                            <span className="px-2 py-1 rounded-1 ms-2" id={item.id} style={{ color: item.cor.includes('0') ? 'black' : 'white', background: item.cor }} >
+                                                                                {item.nome}
+                                                                            </span>
+                                                                        </div>
+                                                                        <div className="col-2">
+                                                                            <button style={{ background: 'transparent', border: 0, outline: 0 }} type="button"
+                                                                                className="main-text"
+                                                                                onClick={() => {
+                                                                                    setLabelName(item.nome)
+                                                                                    setLabelId(item.id);
+                                                                                    openModal('labelModal')
+                                                                                }} >
+                                                                                <i className="fa fa-pen main-text" >
+                                                                                </i>
+                                                                            </button>
+                                                                        </div>
+                                                                    </div>
+                                                                </li>
+                                                            )
+                                                        })}
+                                                    </ul>
+
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </>
+                                )}
+
                                 <div className="form-group row px-3 mt-4">
                                     <div className="col-12 text-start">
                                         <label htmlFor="txtTaskDescription" className="form-label fs-4 main-text">Task Description</label>
@@ -564,7 +594,6 @@ export default function ModalSaveTask({ bucketId, statusComboBoxOptions,
                                     </div>
                                 </div>
 
-
                                 <div className="form-group row px-3">
                                     <div className="col-4 text-start">
                                         <label htmlFor="txtDescription" className="form-label fs-4 main-text">Start Date</label>
@@ -573,7 +602,8 @@ export default function ModalSaveTask({ bucketId, statusComboBoxOptions,
                                             className="main-text ipt-bg rounded border-0"
                                             locale={navigator.language}
                                             isClearable
-                                            selected={editedTask?.dataInicio ? editedTask.dataInicio : startDate} onChange={(date) => setStartDate(date)}
+                                            selected={startDate}
+                                            onChange={(date) => setStartDate(date)}
                                         />
                                     </div>
                                     <div className="col-4 text-start">
@@ -583,74 +613,81 @@ export default function ModalSaveTask({ bucketId, statusComboBoxOptions,
                                             className="main-text ipt-bg rounded border-0"
                                             locale={navigator.language}
                                             isClearable
-                                            selected={editedTask?.dataFim ? editedTask.dataFim : endDate} onChange={(date) => setEndDate(date)}
+                                            selected={endDate}
+                                            onChange={(date) => setEndDate(date)}
+
                                         />
                                     </div>
                                     <div className="col-10">
                                         <div className="input-group"></div>
                                     </div>
                                 </div>
-                                <div className="form-group row px-3 pb-3 mt-3">
-                                    <div className="col-12 text-start">
-                                        <label className="main-text fw-bold fs-5">Attaches</label>
-                                    </div>
-                                </div>
-                                <div className="form-group row px-3">
-                                    <div className="text-start col-12">
-                                        <label className="ipt-file" htmlFor="fileAttach">Add attach</label>
-                                    </div>
-                                    <input className="d-none" id='fileAttach' onChange={(e) => addAttach(e.target.files)} type="file" />
-                                </div>
-                                <div className="form-group row px-3">
-
-                                    {editedTask?.anexos?.map((item, index) => {
-                                        return <div key={index} role="button" onClick={() => { handleOpenFile(item) }}
-                                            className="text-start mt-3">
-
-                                            {
-                                                item.nomeArquivo.includes('.png') || item.nomeArquivo.includes('.jpg') ?
-                                                    <img id={'attach' + item.id} alt='' style={{
-                                                        width: 60, height: 40,
-                                                    }} src={"data:image;base64," + item.arquivoBase64}
-                                                    /> : <i className="fa fa-play main-text mx-4"></i>
-                                            }
-
-                                            <span className="ms-2 main-text">{item.nomeArquivo}</span>
+                                {editMode && (<>
+                                    <div className="form-group row px-3 pb-3 mt-3">
+                                        <div className="col-12 text-start">
+                                            <label className="main-text fw-bold fs-5">Attaches</label>
                                         </div>
-                                    }
-                                    )}
-                                </div>
-                                <div className="form-group row px-3 pb-3 mt-5">
-                                    <div className="col-12 text-start">
-                                        <label className="main-text fs-5 fw-bold">Comments</label>
                                     </div>
-                                </div>
 
-                                <div className="form-group row px-3">
-
-                                    <textarea className="ipt mb-4" id='txtComment'></textarea>
-                                    <div className="px-3 text-end">
-                                        <button style={{ width: 'fit-content' }}
-                                            type='button' onClick={addComment}
-                                            className="button-cancel-outline ">Add comment</button>
-                                    </div>
-                                    {editedTask?.comentarios?.map((item, index) => {
-                                        return <div key={index} className="my-3 row pt-4">
-                                            <span className="main-text col-3 text-start"> {item.usuarioNome}</span>
-                                            <span className="main-text col-3 text-start"> {new Date(item.dataInclusao).toLocaleString()}</span>
-                                            <i onClick={() => removeComment(item.id)} role="button" className="fa fa-trash col-6 text-danger text-end"></i>
-                                            <span className="ipt mt-2 text-start" style={{ minHeight: 50 }} >
-                                                {item.texto}
-                                            </span>
+                                    <div className="form-group row px-3">
+                                        <div className="text-start col-12">
+                                            <label className="ipt-file" htmlFor="fileAttach">Add attach</label>
                                         </div>
-                                    })}
+                                        <input className="d-none" id='fileAttach' onChange={(e) => addAttach(e.target.files)} type="file" />
+                                    </div>
+
+                                    <div className="form-group row px-3">
+
+                                        {editedTask?.anexos?.map((item, index) => {
+                                            return <div key={index} role="button" onClick={() => { handleOpenFile(item) }}
+                                                className="text-start mt-3">
+
+                                                {
+                                                    item.nomeArquivo.includes('.png') || item.nomeArquivo.includes('.jpg') ?
+                                                        <img id={'attach' + item.id} alt='' style={{
+                                                            width: 60, height: 40,
+                                                        }} src={"data:image;base64," + item.arquivoBase64}
+                                                        /> : <i className="fa fa-play main-text mx-4"></i>
+                                                }
+
+                                                <span className="ms-2 main-text">{item.nomeArquivo}</span>
+                                            </div>
+                                        }
+                                        )}
+                                    </div>
+
+                                    <div className="form-group row px-3 pb-3 mt-5">
+                                        <div className="col-12 text-start">
+                                            <label className="main-text fs-5 fw-bold">Comments</label>
+                                        </div>
+                                    </div>
+
+                                    <div className="form-group row px-3">
+
+                                        <textarea className="ipt mb-4" id='txtComment'></textarea>
+                                        <div className="px-3 text-end">
+                                            <button style={{ width: 'fit-content' }}
+                                                type='button' onClick={addComment}
+                                                className="button-cancel-outline ">Add comment</button>
+                                        </div>
+                                        {editedTask?.comentarios?.map((item, index) => {
+                                            return <div key={index} className="my-3 row pt-4">
+                                                <span className="main-text col-3 text-start"> {item.usuarioNome}</span>
+                                                <span className="main-text col-3 text-start"> {new Date(item.dataInclusao).toLocaleString()}</span>
+                                                <i onClick={() => removeComment(item.id)} role="button" className="fa fa-trash col-6 text-danger text-end"></i>
+                                                <span className="ipt mt-2 text-start" style={{ minHeight: 50 }} >
+                                                    {item.texto}
+                                                </span>
+                                            </div>
+                                        })}
 
 
-                                </div>
+                                    </div>
+                                </>)}
                             </div>
                             <div className="modal-footer justify-content-between">
                                 <button onClick={() => onClose()} type="button" className="button-cancel text-start" data-bs-dismiss="modal">Close</button>
-                                <button onClick={() => { global.util.isNullOrEmpty(editedTask?.id) ? taskCreate() : taskUpdate() }}
+                                <button data-bs-dismiss="modal" onClick={() => { global.util.isNullOrEmpty(editedTask?.id) ? taskCreate() : taskUpdate() }}
                                     type='button' className='button text-end'>SAVE</button>
                             </div>
                         </form>

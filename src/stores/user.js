@@ -18,11 +18,9 @@ function isAuthenticated() {
     }
 }
 
-
 function getUserData() {
     return jwtDecode(getCookie("kanplan_token"));
 }
-
 
 const getUserEmail = () => getUserData().email
 

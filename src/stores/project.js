@@ -11,7 +11,7 @@ async function getProject(projectId) {
    }
 }
 
-async function getUsers(projectId){
+async function getUsers(projectId) {
    try {
       const response = await get('Project/GetUsersByProject/' + projectId);
       return response;
@@ -48,6 +48,15 @@ async function deleteProject(id) {
    }
 }
 
-export { getProject, getUsers, createProject, updateProject, deleteProject }
+async function assignUserToProject(userId, projectId) {
+   try {
+      const resposta = await post('Project/RelateUserToProject?userId=' + userId + "&projectId=" + projectId);
+      return resposta;
+   } catch (error) {
+      console.error(error)
+   }
+}
+
+export { getProject, getUsers, createProject, updateProject, deleteProject, assignUserToProject }
 
 //Short URL Token 18e12f3f0c7981b124ca7de9a2a5e03600226496
