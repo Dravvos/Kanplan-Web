@@ -110,25 +110,25 @@ export default function User() {
             <main className="mt-5">
                 <div className="container-fluid">
                     <div className="row">
-                        <div className="col-md-1 text-end">
+                        <div className="col-3 col-sm-2 col-md-1 text-end">
                             <img ref={fileUploadRef} id='fileUpload' src={"data:image;base64," + profilePhoto} className="border img" alt="" onClick={handleFileClick} />
                             <input id='inputPhoto' type="file" accept="image/*" className="d-none" ref={inputPhotoRef} onChange={handleFileChange} />
                         </div>
-                        <div className="col-md-2 text-start">
+                        <div className="col-6 text-start">
                             <p className="main-text fs-3"> {user?.nome}</p>
                             <p className="main-text">{user?.email}</p>
                         </div>
                     </div>
                     <hr />
                     <div className="row justify-content-center">
-                        <div className="col-2 text-start">
+                        <div className="col-8 col-sm-6 col-md-5 col-lg-4 col-xl-3 col-xxl-3 text-start">
                             <label className="main-text pb-2">Name: </label>
                             <input className="ipt" value={user?.nome} />
                         </div>
 
                     </div>
                     <div className="row justify-content-center mt-4">
-                        <div className="col-2 text-start">
+                        <div className="col-8 col-sm-6 col-md-5 col-lg-4 col-xl-3 col-xxl-3 text-start">
                             <label className="main-text pb-2">Change Password </label>
                             <input className="ipt" type="password" value={passwordChanged} onChange={(e) => setPasswordChanged(e.target.value)} />
                         </div>

@@ -6,8 +6,9 @@ import { post } from "../services/api-handler";
 import global from "../stores/global";
 import { createBucket } from "../stores/bucket"
 import { getUserEmail } from "../stores/user";
-import { useNavigate } from "react-router-dom";
+import { Link,useNavigate } from "react-router-dom";
 import { deleteCookie } from "../services/cookie-handler";
+
 
 export default function Header() {
 
@@ -72,18 +73,16 @@ export default function Header() {
                         <div className="collapse navbar-collapse" id="navbarSupportedContent">
                             <ul className="navbar-nav me-auto mb-2 mb-lg-0">
                                 <li className="nav-item">
-                                    <a className="nav-link active main-text" aria-current="page" href="../">Home</a>
+                                    <a className="nav-link active main-text" aria-current="page" href="./">Home</a>
                                 </li>
                                 <li className="nav-item">
-                                    <a className="nav-link main-text" href="../Projects">Projects</a>
+                                    <Link to="/Projects" className="nav-link main-text">Projects</Link>
                                 </li>
                                 <li className="nav-item">
                                     <button data-bs-toggle="modal" data-bs-target="#createProjectModal" className="nav-link main-text">Create Project</button>
-
                                 </li>
                             </ul>
-                            <a title="Your profile" href="/User" > <i className='fa fa-user main-text'></i></a>
-
+                            <Link to='/User'><i className='fa fa-user main-text'></i></Link>
                         </div>
                     </div>
                 </nav>

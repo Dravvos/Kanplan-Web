@@ -26,6 +26,8 @@ export default function ModalSaveTask({ bucketId, statusComboBoxOptions,
     callbackSuccess, callbackFail, onClose
 }) {
 
+    //#region useState
+
     const [selectedPriority, setSelectedPriority] = useState(null);  //selected priority in combobox
     const [selectedStatus, setSelectedStatus] = useState(null);  //selected status in combobox
     const [editedTask, setEditedTask] = useState(null);
@@ -40,6 +42,10 @@ export default function ModalSaveTask({ bucketId, statusComboBoxOptions,
     const [dropdownVisible, setDropdownVisible] = useState(false);
     const navigate = useNavigate();
     const [editMode, setEditMode] = useState(false);
+
+    //#endregion
+
+    //#region functions
 
     function openModal(modalId) {
         var modal = new bootstrap.Modal($('#' + modalId)[0]);
@@ -410,6 +416,8 @@ export default function ModalSaveTask({ bucketId, statusComboBoxOptions,
         }
     }, [navigate, callbackSuccess, dropdownVisible, editedTask?.id, toggleDropdownVisibility]);
 
+    //#endregion
+
     useEffect(() => {
         fetchPriorities();
         fetchLabels();
@@ -595,8 +603,8 @@ export default function ModalSaveTask({ bucketId, statusComboBoxOptions,
                                 </div>
 
                                 <div className="form-group row px-3">
-                                    <div className="col-4 text-start">
-                                        <label htmlFor="txtDescription" className="form-label fs-4 main-text">Start Date</label>
+                                    <div className="col-12 col-sm-6 col-md-6 col-lg-4 col-xl-4 col-xxl-4 text-start">
+                                        <label htmlFor="txtDescription" className="form-label fs-4 main-text col-12">Start Date</label>
                                         <DatePicker
                                             showIcon
                                             className="main-text ipt-bg rounded border-0"
@@ -606,8 +614,8 @@ export default function ModalSaveTask({ bucketId, statusComboBoxOptions,
                                             onChange={(date) => setStartDate(date)}
                                         />
                                     </div>
-                                    <div className="col-4 text-start">
-                                        <label htmlFor="txtDescription" className="form-label fs-4 main-text">End Date</label>
+                                    <div className="col-12 col-sm-6 col-md-6 col-lg-4 col-xl-4 col-xxl-4 text-start">
+                                        <label htmlFor="txtDescription" className="form-label fs-4 main-text col-12">End Date</label>
                                         <DatePicker
                                             showIcon
                                             className="main-text ipt-bg rounded border-0"

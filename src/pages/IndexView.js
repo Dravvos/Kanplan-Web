@@ -15,7 +15,7 @@ function Index() {
 
     return (
         <div className='body'>
-            <div className="container">
+            <div className="container col-12">
                 <header className="header">
 
                     <h1>Welcome to Your Kanban Board</h1>

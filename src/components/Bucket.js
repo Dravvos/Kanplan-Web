@@ -23,6 +23,8 @@ import ModalSaveTask from "./ModalSaveTask";
 
 export default function Bucket({ bucketId }) {
 
+    //#region useStates
+
     const [tasks, setTasks] = useState([]);
     const [bucket, setBucket] = useState(null);
     const [selectedBucket, setSelectedBucket] = useState(null);
@@ -43,6 +45,10 @@ export default function Bucket({ bucketId }) {
     const buttonRefs = useRef([]); // Array de refs para os botões
 
     const navigate = useNavigate();
+
+    //#endregion
+
+    //#region Functions
 
     const toggleVisibility = (index) => {
         setIsVisible(!isVisible);
@@ -309,8 +315,10 @@ export default function Bucket({ bucketId }) {
         }
     }
 
+    //#endregion
+
     return (
-        <div className='my-5 me-4 col-2'>
+        <div className='my-5 me-4 col-12 col-sm-7 col-md-6 col-lg-4 col-xl-3 col-xxl-3'>
 
             <div className='bucket'>
                 <div className='text-start'>
