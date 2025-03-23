@@ -146,7 +146,8 @@ export default function Bucket({ bucketId }) {
     useEffect(() => {
         const tooltipTriggerList = document.querySelectorAll('[data-bs-toggle="tooltip"]')
         let tooltipList = [...tooltipTriggerList].map(tooltipTriggerEl => new bootstrap.Tooltip(tooltipTriggerEl));
-        
+        console.log(tooltipList);
+        console.clear();
         
         fetchBucket();
         fetchTasks();
