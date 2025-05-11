@@ -35,7 +35,7 @@ function Index() {
                 </main>
 
                 <footer className="footer">
-                    <p>&copy; 2024 KanPlan. All rights reserved.</p>
+                    <p>&copy; {new Date()} KanPlan. All rights reserved.</p>
                 </footer>
             </div>
         </div>
