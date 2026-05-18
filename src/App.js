@@ -11,7 +11,7 @@ function App() {
   return (
     <div className="App">
 
-      <BrowserRouter basename='/KanPlan.Web'>
+      <BrowserRouter basename='/KanPlan'>
         <Routes>
           <Route  path="/" element={<Navigate to="/Index" />} />
           <Route path='/Index' element={<Index />} />
